@@ -12,6 +12,10 @@ def decorator(decorator_func):
         def art_decor(fn, *args, **kwargs):
             # do something
             return fn(*args, **kwargs)
+
+        @art_decor
+        def my_func(some_string):
+            print some_string
     """
     @wraps(decorator_func)
     def new_decorator(fn):
