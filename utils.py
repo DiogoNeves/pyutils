@@ -1,4 +1,5 @@
 from functools import wraps
+from collections import namedtuple
 
 
 def decorator(decorator_func):
@@ -76,3 +77,15 @@ def wrap_exception(exception_types, new_exception_type):
         except exception_types as ex:
             raise new_exception_type(ex)
     return try_decorator
+
+
+def create_enum(options):
+    """Create a new enum type and object where the values are the name of
+    the options.
+
+    Usage:
+        my_enum = create_enum(['option1', 'option2'])
+        print my_enum.option1
+    """
+    _enum_type = namedtuple('_'.join(options) + '_type', options)
+    return _enum_type(*options)
