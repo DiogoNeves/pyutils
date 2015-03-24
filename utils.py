@@ -1,3 +1,5 @@
+import sys
+
 from functools import wraps
 from collections import namedtuple
 
@@ -75,7 +77,9 @@ def wrap_exception(exception_types, new_exception_type):
         try:
             return fn(*args, **kwargs)
         except exception_types as ex:
-            raise new_exception_type(ex)
+            new_exception = new_exception_type(ex)
+            exception_info = sys.exc_info()
+            raise new_exception.__class__, new_exception, exception_info[2]
     return try_decorator
 
 
