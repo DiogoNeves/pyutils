@@ -40,6 +40,8 @@ def decorator(decorator_func):
 def safe_try(exception_types, default_value=None):
     """Wrap try except around a function and return an optional default_value
     if an exception of exception_types is raised.
+    default_value can be a callable, which will be called with the same
+    attributes of the decorated function.
 
     E.g.:
         @safe_try(KeyError, default_value='mistake')
@@ -48,14 +50,29 @@ def safe_try(exception_types, default_value=None):
 
         print bad_function({'valid_key': 'success'})
         # Out: 'mistake'
+
+
+        @safe_try(Exception, default_value=lambda x: str(x) + ' instead')
+        def worst_function(number):
+            raise Exception()
+
+        print worst_function(3)
+        # Out: '3 instead'
     """
     @decorator
     def try_decorator(fn, *args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except exception_types:
-            return default_value
+            return _copy_or_call(default_value, *args, **kwargs)
     return try_decorator
+
+
+def _copy_or_call(func_or_value, *args, **kwargs):
+    if callable(func_or_value):
+        return func_or_value(*args, **kwargs)
+    else:
+        return type(func_or_value)(func_or_value)
 
 
 def wrap_exception(exception_types, new_exception_type):
