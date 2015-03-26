@@ -37,6 +37,34 @@ def decorator(decorator_func):
 #     return real_decorator
 
 
+def with_attrs(**func_attrs):
+    """Set attributes in the decorated function, at definition time.
+    Only accepts keyword arguments.
+
+    E.g.:
+        @with_attrs(counter=0)
+        def count_it():
+            count_it.counter += 1
+
+        print count_it.counter
+        # Out: 0
+
+    A use case is to create a collection of factories and query the data type
+    they can create at a function meta level.
+    """
+    def attr_decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            return fn(*args, **kwargs)
+
+        for attr, value in func_attrs.iteritems():
+            setattr(wrapper, attr, value)
+
+        return wrapper
+
+    return attr_decorator
+
+
 def safe_try(exception_types, default_value=None):
     """Wrap try except around a function and return an optional default_value
     if an exception of exception_types is raised.
