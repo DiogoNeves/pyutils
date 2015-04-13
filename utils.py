@@ -98,8 +98,11 @@ def safe_try(exception_types, default_value=None):
 
 def _copy_or_call(func_or_value, *args, **kwargs):
     if callable(func_or_value):
-        return func_or_value(*args, **kwargs)
-    else:
+        try:
+            return func_or_value(*args, **kwargs)
+        except TypeError:
+            return func_or_value()
+    elif func_or_value is not None:
         return type(func_or_value)(func_or_value)
 
 
